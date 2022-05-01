@@ -1,19 +1,19 @@
- //const { NotImplementedError } = require('../extensions/index.js');
+const { NotImplementedError } = require('../extensions/index.js');
 
-// const { Node } = require('../extensions/list-tree.js');
+const { Node } = require('../extensions/list-tree.js');
 
 /**
 * Implement simple binary search tree according to task description
 * using Node from extensions
 */
 
-class Node {
-  constructor(data) {
-    this.data = data;
-    this.left = null;
-    this.right = null;
-  }
-}
+// class Node {
+//   constructor(data) {
+//     this.data = data;
+//     this.left = null;
+//     this.right = null;
+//   }
+// }
 
 class BinarySearchTree {
   constructor() {
@@ -95,66 +95,49 @@ class BinarySearchTree {
   }
 
   remove(data) {
-    if (data === null) {
-      return null;
+    this.rootT = removeNode(this.rootT, data);
+
+    function removeNode(node, data) {
+      if (!node) {
+        return;
+      }
+
+      if (data < node.data) {
+        node.left = removeNode(node.left, data);
+        return node;
+      } else if (data > node.data) {
+        node.right = removeNode(node.right, data);
+        return node;
+      } else {
+        // если искомое значение равно значению, которое нашли
+        if (!node.left && !node.right) {
+          // если у ноды нет детей, то заменяем ноду на нулл
+          return null;
+        }
+
+        // если у ноды нет левого литя, то заменяем ноду на правую сторону
+        if (!node.left) {
+          node = node.right;
+          return node;
+        }
+        // если у ноды нет правого литя, то заменяем ноду на левую сторону
+        if (!node.right) {
+          node = node.left;
+          return node;
+        }
+
+        // если у ноды есть оба и правое и левое дитя
+        let minFromRight = node.right;
+        while (minFromRight.left) {
+          minFromRight = minFromRight.left;
+        }
+        node.data = minFromRight.data;
+        node.right = removeNode(node.right, minFromRight.data);
+
+        return node;
+      }
     }
-
-    return this.rootT = this.deleteNode(this.rootT, data);
-  }
-
-
-  deleteNode(currentNode, itemValue) {
-    if (currentNode.data === itemValue) {
-      if (currentNode.left === null && currentNode.right === null) {
-        return null;
-      }
-
-      if (currentNode.left === null) {
-        return currentNode.right;
-      }
-
-      if (currentNode.right === null) {
-        return currentNode.left;
-      }
-
-      // если у ноды есть оба потомка
-      const minNodeInRightSubtree = this.findMinElement(currentNode.right);
-      currentNode.data = minNodeInRightSubtree.value;
-
-      currentNode.right = this.deleteNode(
-        currentNode.right,
-        minNodeInRightSubtree.value
-      );
-      return currentNode;
-    }
-
-    if (itemValue < currentNode.data) {
-      if (currentNode.left === null) {
-        console.warn(elementNotFoundMessage);
-        return currentNode;
-      }
-
-      currentNode.left = this.deleteNode(currentNode.left, itemValue);
-      return currentNode;
-    }
-
-    if (itemValue > currentNode.data) {
-      if (currentNode.right === null) {
-        console.warn(elementNotFoundMessage);
-        return currentNode;
-      }
-
-      currentNode.right = this.deleteNode(currentNode.right, itemValue);
-      return currentNode;
-    }
-  }
-
-  findMinElement(node) {
-    if (node.left === null) return node;
-
-    return this.findMinElement(node.left);
-  }
-
+  }  
 
   min() {
     this.minT = this.rootT;
